@@ -29,6 +29,11 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print each state in the solution path.",
     )
+    p.add_argument(
+        "--trace",
+        action="store_true",
+        help="Print exploration order (each state as it is expanded).",
+    )
     return p
 
 
@@ -50,9 +55,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     )
 
     if args.method == "bfs":
-        path = bfs(start, goal, max_expansions=args.max_steps)
+        path = bfs(start, goal, max_expansions=args.max_steps, trace=args.trace)
     else:
-        path = dfs(start, goal, max_expansions=args.max_steps)
+        path = dfs(start, goal, max_expansions=args.max_steps, trace=args.trace)
 
     if path is None:
         print(f"No solution found with {args.method.upper()} within {args.max_steps} expansions.")
@@ -63,11 +68,9 @@ def main(argv: Iterable[str] | None = None) -> int:
         print("Internal error: produced an invalid solution path.")
         return 3
 
-    print(f"Method: {args.method.upper()}")
-    print(f"Moves: {len(path) - 1}")
     if args.show_states:
         print(format_path(path))
     else:
-        print("Run with --show-states to display the full state-by-state solution.")
+        print(f"Method: {args.method.upper()} | Moves: {len(path) - 1} (run with --show-states for full path)")
 
     return 0

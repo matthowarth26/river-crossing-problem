@@ -8,8 +8,15 @@ from app.solver.solution import reconstruct_path
 from app.solver.state import State
 
 
-def bfs(start: State, goal: State, *, max_expansions: int = 10_000) -> Optional[list[State]]:
-    """Breadth-first search (guarantees shortest solution in number of moves)."""
+def _depth(parent: dict[State, State | None], node: State) -> int:
+    d = 0
+    while parent[node] is not None:
+        node = parent[node]  # type: ignore[assignment]
+        d += 1
+    return d
+
+
+def bfs(start: State, goal: State, *, max_expansions: int = 10_000, trace: bool = False) -> Optional[list[State]]:
     if not is_valid(start) or not is_valid(goal):
         return None
 
@@ -19,6 +26,11 @@ def bfs(start: State, goal: State, *, max_expansions: int = 10_000) -> Optional[
 
     while q:
         cur = q.popleft()
+
+        if trace:
+            print(f"[BFS] Exploring depth {_depth(parent, cur)}")
+            print(cur)
+
         if cur == goal:
             return reconstruct_path(parent, cur)
 
